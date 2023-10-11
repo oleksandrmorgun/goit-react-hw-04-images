@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Component } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import PropTypes from 'prop-types';
 import {
@@ -9,44 +9,50 @@ import {
   SearchLogo,
 } from './SearchBar.styled';
 
-const SearchBar = ({ onSubmit }) => {
-  const [searchName, setSearchName] = useState('');
-  const [inputValue, setInputValue] = useState('');
+class SearchBar extends Component {
+  state = {
+    searchName: '', // Хранит значение введенного поискового запроса
+    inputValue: '',
+  };
 
-  const handleChange = event => setInputValue(event.target.value);
+  handleChange = event => {
+    this.setState({ inputValue: event.target.value });
+  };
 
-  const handleSubmit = event => {
+  handleSubmit = event => {
     event.preventDefault(); // Предотвращаем стандартное поведение формы
-    setSearchName(inputValue.trim()); // Получаем введенный поисковый запрос и удаляем пробелы
-    onSubmit(searchName); // Передаем введенный поисковый запрос родительскому компоненту
+    const searchQuery = event.target.elements.searchName.value.trim(); // Получаем введенный поисковый запрос и удаляем пробелы
+    this.props.onSubmit(searchQuery); // Передаем введенный поисковый запрос родительскому компоненту
     event.target.reset(); // Сбрасываем значение в поле ввода после отправки формы
   };
 
-  return (
-    <header>
-      <SearchForm onSubmit={handleSubmit}>
-        <a href="https://pixabay.com/" target="_blank" rel="noreferrer">
-          <SearchLogo
-            src={require('./pixabay-logo.png')} // Логотип Pixabay
-            alt="logo"
-            width="200"
+  render() {
+    return (
+      <header>
+        <SearchForm onSubmit={this.handleSubmit}>
+          <a href="https://pixabay.com/" target="_blank" rel="noreferrer">
+            <SearchLogo
+              src={require('./pixabay-logo.png')} // Логотип Pixabay
+              alt="logo"
+              width="200"
+            />
+          </a>
+          <SearchButton>
+            <BsSearch />
+            <SearchSpan>Search</SearchSpan>
+          </SearchButton>
+          <SearchInput
+            name="searchName"
+            type="text"
+            id="search"
+            value={this.state.inputValue}
+            onChange={this.handleChange}
           />
-        </a>
-        <SearchButton>
-          <BsSearch />
-          <SearchSpan>Search</SearchSpan>
-        </SearchButton>
-        <SearchInput
-          name="searchName"
-          type="text"
-          id="search"
-          value={inputValue}
-          onChange={handleChange}
-        />
-      </SearchForm>
-    </header>
-  );
-};
+        </SearchForm>
+      </header>
+    );
+  }
+}
 
 SearchBar.propTypes = {
   onSubmit: PropTypes.func.isRequired,
